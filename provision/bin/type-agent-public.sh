@@ -27,3 +27,27 @@ if [ -n "${DCOS_TASK_MEMORY:-}" ]; then
   rm -f /var/lib/mesos/slave/meta/slaves/latest
   systemctl start dcos-mesos-slave-public.service --no-block
 fi
+
+# Setup Docker daemon for overlay networking support
+if [ -n "${DCOS_OVERLAYNET_ENABLED:-}" ]; then
+  echo ">>> Registering cluster for Docker overlay networking (store=boot.dcos:2181, listen=:2376, advertise=:3376)"
+  # TODO: TLS authentication - see https://docs.docker.com/v1.11/engine/security/https/
+  sed -i -e '/^ExecStart=/ s/$/ --cluster-store=zk:\/\/boot.dcos:2181 --cluster-advertise=enp0s8:3376/' /usr/lib/systemd/system/docker.service
+  cat << 'EOF' > "/usr/lib/systemd/system/docker-tcp.socket"
+[Unit]
+Description=Docker Socket for the API
+
+[Socket]
+ListenStream=2376
+Service=docker.service
+BindIPv6Only=both
+
+[Install]
+WantedBy=sockets.target
+EOF
+
+  echo ">>> Reloading systemd service configs"
+  systemctl daemon-reload
+  echo ">>> Restarting docker"
+  systemctl restart docker
+fi

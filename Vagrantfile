@@ -18,6 +18,7 @@ class UserConfig
   attr_accessor :vagrant_mount_method
   attr_accessor :java_enabled
   attr_accessor :private_registry
+  attr_accessor :overlaynet_enabled
 
   def self.from_env
     c = new
@@ -31,6 +32,7 @@ class UserConfig
     c.vagrant_mount_method = ENV.fetch('DCOS_VAGRANT_MOUNT_METHOD', 'virtualbox')
     c.java_enabled         = (ENV.fetch('DCOS_JAVA_ENABLED', 'false') == 'true')
     c.private_registry     = (ENV.fetch('DCOS_PRIVATE_REGISTRY', 'false') == 'true')
+    c.overlaynet_enabled   = (ENV.fetch('DCOS_OVERLAYNET_ENABLED', 'false') == 'true')
     c
   end
 
@@ -80,7 +82,8 @@ class UserConfig
       'DCOS_CONFIG_PATH' => path_to_url(@config_path),
       'DCOS_GENERATE_CONFIG_PATH' => path_to_url(@generate_config_path),
       'DCOS_JAVA_ENABLED' => @java_enabled ? 'true' : 'false',
-      'DCOS_PRIVATE_REGISTRY' => @private_registry ? 'true' : 'false'
+      'DCOS_PRIVATE_REGISTRY' => @private_registry ? 'true' : 'false',
+      'DCOS_OVERLAYNET_ENABLED' => @overlaynet_enabled ? 'true' : 'false'
     }
     if machine_type['memory-reserved']
       env['DCOS_TASK_MEMORY'] = machine_type['memory'] - machine_type['memory-reserved']

@@ -65,5 +65,8 @@ There are several configurable options when deploying a cluster and installing D
 - `DCOS_VAGRANT_MOUNT_METHOD` - One of the following methods (default: `virtualbox`):
     - `virtualbox` - Use cross-platform [VirtualBox shared folders](https://www.vagrantup.com/docs/synced-folders/virtualbox.html)
     - `nfs` - Use faster [NFS shared folders](https://www.vagrantup.com/docs/synced-folders/nfs.html).
+- `DCOS_OVERLAYNET_ENABLED` - Boolean to enable Docker overlay networking (default: `false`)
+    - When this option is enabled, overlay networks created in Docker on any agent node become available to Docker on all other agent nodes
+    - Enabling this option also opens the Docker daemon TCP endpoint at port 2376 on each agent node
 
 Additional advanced configuration may be possible by modifying the Vagrantfile directly, but is not encouraged because the internal APIs may change at any time.
